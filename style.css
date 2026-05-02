@@ -108,6 +108,13 @@ button {
   border-left: 3px solid #00eaff;
 }
 
+/* 🔥 NEW CALC STYLE */
+#calc {
+  font-size: 14px;
+  line-height: 1.6;
+  border:1px solid #555;
+}
+
 /* Danger */
 .danger-zone { text-align:center; margin-top:40px; }
 
@@ -127,6 +134,7 @@ button {
   left:0;
   justify-content:center;
   align-items:center;
+  z-index:999;
 }
 
 .popup-box {

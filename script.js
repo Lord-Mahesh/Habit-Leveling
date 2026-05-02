@@ -15,17 +15,31 @@ const normal = [
 ];
 
 const bonus = [
+  {name:"🌅 Wake before 6:30",xp:5},
+  {name:"🌙 Sleep before 11",xp:5},
   {name:"🏋️ Weights",xp:5},
   {name:"⚡ Cube PB",xp:10},
   {name:"🔥 Hard Practice",xp:10}
 ];
 
-let data = JSON.parse(localStorage.getItem("lifeGame")) || {
-  xp:0,streak:0,level:1,levelXP:0,history:{}
-};
+function initialData(){
+  return {
+    xp:0,
+    streak:0,
+    level:1,
+    levelXP:0,
+    history:{}
+  };
+}
+
+let data = JSON.parse(localStorage.getItem("lifeGame")) || initialData();
 
 function today(){
   return new Date().toDateString();
+}
+
+function getDay(){
+  return new Date().getDay(); // 0=Sun, 6=Sat
 }
 
 function showDate(){
@@ -64,6 +78,7 @@ function update(){
   document.getElementById("level").innerText = data.level;
 
   let percent = (data.levelXP / need(data.level)) * 100;
+  percent = Math.min(percent,100);
 
   document.getElementById("xp-fill").style.width = percent + "%";
   document.getElementById("xp-text").innerText =
@@ -71,48 +86,85 @@ function update(){
 }
 
 function endDay(){
-  let k = today();
-  if(data.history[k]) return alert("Already done today");
+  const k = today();
+
+  if(data.history[k]){
+    alert("Already submitted today");
+    return;
+  }
+
+  const day = getDay();
+  const isWeekend = (day === 0 || day === 6);
+  const isSunday = (day === 0);
 
   let dailyXP = 0;
-  let done = 0;
+  let coreDone = 0;
 
+  // CORE
   core.forEach((h,i)=>{
     if(document.getElementById("c"+i).checked){
       dailyXP += h.xp;
-      done++;
+      coreDone++;
     }
   });
 
+  // NORMAL
+  let allNormalDone = true;
   normal.forEach((h,i)=>{
     if(document.getElementById("n"+i).checked){
       dailyXP += h.xp;
+    } else {
+      allNormalDone = false;
     }
   });
 
+  // BONUS
   bonus.forEach((h,i)=>{
     if(document.getElementById("b"+i).checked){
       dailyXP += h.xp;
     }
   });
 
-  // punishments
-  if(!document.getElementById("c0").checked) dailyXP -= 20;
-  if(!document.getElementById("c1").checked) dailyXP -= 10;
-  if(!document.getElementById("c2").checked) dailyXP -= 3;
-  if(!document.getElementById("c3").checked) dailyXP -= 3;
-  if(!document.getElementById("c4").checked) dailyXP -= 3;
+  // PENALTIES (weekend logic)
+  core.forEach((h,i)=>{
+    const checked = document.getElementById("c"+i).checked;
 
-  let skip = 6 - done;
+    if(i === 0 && isWeekend) return; // College skip
+    if(i === 1 && isSunday) return;  // Gym skip
 
-  if(skip >= 3){
+    if(!checked){
+      if(i === 0) dailyXP -= 20;
+      else if(i === 1) dailyXP -= 10;
+      else dailyXP -= 3;
+    }
+  });
+
+  // PERFECT DAY
+  const allCoreDone = coreDone === core.length;
+  const notLazy = document.getElementById("lazyNo").checked;
+
+  if(allCoreDone && allNormalDone && notLazy){
+    dailyXP += 5;
+  }
+
+  // STREAK
+  let effectiveCore = 6;
+  if(isWeekend) effectiveCore--;
+  if(isSunday) effectiveCore--;
+
+  const skipped = effectiveCore - coreDone;
+
+  if(skipped >= 3){
     data.streak = 0;
   } else {
     data.streak++;
     dailyXP += 2;
-    if(data.streak % 10 === 0) dailyXP += 15;
+    if(data.streak % 10 === 0){
+      dailyXP += 15;
+    }
   }
 
+  // LEVEL
   data.levelXP += dailyXP;
 
   while(data.levelXP >= need(data.level)){
@@ -122,21 +174,47 @@ function endDay(){
 
   data.xp += dailyXP;
 
-  data.history[k] = {
-    xp: dailyXP,
-    notes: document.getElementById("notes").value || "-"
-  };
+  data.history[k] = { xp: dailyXP };
 
   localStorage.setItem("lifeGame", JSON.stringify(data));
 
   update();
   showHistory();
-  resetDay();
+}
+
+function resetDay(){
+  const confirmReset = confirm(
+    "Reset TODAY?\nThis will clear XP, level, streak, history, notes."
+  );
+  if(!confirmReset) return;
+
+  // Full wipe of app state
+  data = initialData();
+
+  // Clear UI
+  document.querySelectorAll("input").forEach(i=>{
+    if(i.type === "checkbox" || i.type === "radio") i.checked = false;
+  });
+  document.getElementById("notes").value = "";
+
+  localStorage.setItem("lifeGame", JSON.stringify(data));
+
+  update();
+  showHistory();
+}
+
+function completeReset(){
+  const confirmReset = confirm(
+    "⚠️ This will delete EVERYTHING from storage.\nContinue?"
+  );
+  if(!confirmReset) return;
+
+  localStorage.clear();
+  location.reload();
 }
 
 function showHistory(){
   const historyDiv = document.getElementById("history");
-
   historyDiv.innerHTML = "";
 
   const days = Object.keys(data.history);
@@ -146,38 +224,17 @@ function showHistory(){
     return;
   }
 
-  // sort latest first
   days.sort((a,b)=> new Date(b) - new Date(a));
 
   days.forEach(day=>{
     const d = data.history[day];
-
     historyDiv.innerHTML += `
       <div class="history-day">
         <b>${day}</b><br>
-        XP: ${d.xp}<br>
-        Notes: ${d.notes}
+        XP: ${d.xp}
       </div>
     `;
   });
-}
-
-function resetDay(){
-  document.querySelectorAll("input").forEach(i=>i.checked=false);
-  document.getElementById("notes").value = "";
-}
-
-function showResetPopup(){
-  document.getElementById("reset-popup").style.display="flex";
-}
-
-function closePopup(){
-  document.getElementById("reset-popup").style.display="none";
-}
-
-function completeReset(){
-  localStorage.clear();
-  location.reload();
 }
 
 showDate();

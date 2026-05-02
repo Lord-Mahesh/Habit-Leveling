@@ -1,11 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 <head>
   <title>Life Game</title>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -49,28 +47,32 @@
     <textarea id="notes"></textarea>
   </div>
 
+  <div class="card">
+    <h3>🧠 Mind Check</h3>
+    <label><input type="radio" name="lazy" id="lazyNo"> ❌ No (Focused)</label>
+    <label><input type="radio" name="lazy" id="lazyYes"> 😴 Yes (Lazy)</label>
+  </div>
+
 </div>
 
 <div class="buttons">
   <button class="end" onclick="endDay()">🚀 Complete Day</button>
-  <button class="reset" onclick="resetDay()">♻️ Reset</button>
+  <button class="reset" onclick="resetDay()">♻️ Reset Today</button>
 </div>
 
-<!-- Danger Zone -->
-<div class="danger-zone">
-  <button class="danger" onclick="showResetPopup()">💀 Complete Reset</button>
-</div>
-
-<!-- Popup -->
-<div id="reset-popup" class="popup">
-  <div class="popup-box">
-    <h3>⚠️ WARNING</h3>
-    <p>This will erase EVERYTHING:<br>
-    XP, Level, Streak, Notes & History.</p>
-
-    <button class="confirm" onclick="completeReset()">YES, RESET</button>
-    <button class="cancel" onclick="closePopup()">Cancel</button>
-  </div>
+<div style="text-align:center;margin-top:30px;">
+  <button onclick="completeReset()" style="
+    background: linear-gradient(135deg,#ff0033,#990000);
+    color:white;
+    padding:14px 28px;
+    border:none;
+    border-radius:12px;
+    font-size:18px;
+    box-shadow:0 0 15px red;
+    cursor:pointer;
+  ">
+    💀 Complete Reset
+  </button>
 </div>
 
 <h3 class="history-title">📅 History</h3>
