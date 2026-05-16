@@ -1,148 +1,345 @@
-body {
-  font-family: 'Poppins';
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  color: #e0f7ff;
-  margin: 0;
-  padding: 20px;
+const core = [
+  {name:"🏫 College",xp:15},
+  {name:"💪 Gym",xp:15},
+  {name:"📖 Reading",xp:10},
+  {name:"🎸 Ukulele",xp:5},
+  {name:"🧩 Cube",xp:5},
+  {name:"🧘 Meditation",xp:5}
+];
+
+const normal = [
+  {name:"🤸 Stretching",xp:5},
+  {name:"🥚 Eggs",xp:5},
+  {name:"💰 Spending",xp:5},
+  {name:"🪥 Brush",xp:5}
+];
+
+const bonus = [
+  {name:"🌅 Wake before 6:30",xp:5},
+  {name:"🌙 Sleep before 11",xp:5},
+  {name:"🏋️ Weights",xp:5},
+  {name:"⚡ Cube PB",xp:10},
+  {name:"🔥 Hard Practice",xp:10}
+];
+
+function initialData(){
+  return {
+    xp:0,
+    streak:0,
+    level:1,
+    levelXP:0,
+    history:{},
+    notes:""
+  };
 }
 
-h1 {
-  text-align: center;
-  font-size: 42px;
-  font-family: 'Orbitron';
-  color: #00eaff;
-  text-shadow: 0 0 15px #00eaff;
+let data =
+  JSON.parse(localStorage.getItem("lifeGame"))
+  || initialData();
+
+function today(){
+  return new Date().toDateString();
 }
 
-#date {
-  text-align: center;
-  opacity: 0.8;
+function showDate(){
+  document.getElementById("date").innerText =
+    today();
 }
 
-.top-bar {
-  display: flex;
-  justify-content: space-around;
-  margin: 25px 0;
-  font-family: 'Rajdhani';
-  font-size: 20px;
+function render(){
+
+  const coreDiv =
+    document.getElementById("core");
+
+  const normalDiv =
+    document.getElementById("normal");
+
+  const bonusDiv =
+    document.getElementById("bonus");
+
+  coreDiv.innerHTML = "";
+  normalDiv.innerHTML = "";
+  bonusDiv.innerHTML = "";
+
+  core.forEach((h,i)=>{
+
+    coreDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="c${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
+  normal.forEach((h,i)=>{
+
+    normalDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="n${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
+  bonus.forEach((h,i)=>{
+
+    bonusDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="b${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
 }
 
-.container {
-  display: grid;
-  gap: 15px;
+function need(level){
+  return 100 + (level - 1);
 }
 
-.card {
-  padding: 18px;
-  border-radius: 15px;
+function update(){
+
+  document.getElementById("xp").innerText =
+    data.xp;
+
+  document.getElementById("streak").innerText =
+    data.streak;
+
+  document.getElementById("level").innerText =
+    data.level;
+
+  let percent =
+    (data.levelXP / need(data.level)) * 100;
+
+  percent = Math.min(percent,100);
+
+  document.getElementById("xp-fill").style.width =
+    percent + "%";
+
+  document.getElementById("xp-text").innerText =
+    `${data.levelXP}/${need(data.level)} XP`;
+
 }
 
-.core { background: rgba(0,234,255,0.1); border:1px solid #00eaff; }
-.normal { background: rgba(0,255,170,0.1); border:1px solid #00ffaa; }
-.bonus { background: rgba(255,0,200,0.1); border:1px solid #ff00c8; }
-.notes { background: rgba(255,255,255,0.05); border:1px solid #aaa; }
+/* NOTES */
 
-label {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
+const notesBox =
+  document.getElementById("notes");
+
+notesBox.value = data.notes || "";
+
+notesBox.addEventListener("input",()=>{
+
+  data.notes = notesBox.value;
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+});
+
+/* MIND */
+
+const focusedCard =
+  document.getElementById("focusedCard");
+
+const lazyCard =
+  document.getElementById("lazyCard");
+
+focusedCard.addEventListener("click",()=>{
+
+  document.getElementById("lazyNo").checked = true;
+
+  focusedCard.classList.add("selected");
+
+  lazyCard.classList.remove("selected");
+
+});
+
+lazyCard.addEventListener("click",()=>{
+
+  document.getElementById("lazyYes").checked = true;
+
+  lazyCard.classList.add("selected");
+
+  focusedCard.classList.remove("selected");
+
+});
+
+/* END DAY */
+
+function endDay(){
+
+  const k = today();
+
+  if(data.history[k]){
+    alert("Already submitted today");
+    return;
+  }
+
+  let dailyXP = 0;
+
+  core.forEach((h,i)=>{
+    if(document.getElementById("c"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  normal.forEach((h,i)=>{
+    if(document.getElementById("n"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  bonus.forEach((h,i)=>{
+    if(document.getElementById("b"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  data.streak++;
+
+  data.levelXP += dailyXP;
+
+  while(data.levelXP >= need(data.level)){
+
+    data.levelXP -= need(data.level);
+
+    data.level++;
+
+  }
+
+  data.xp += dailyXP;
+
+  data.history[k] = {
+    xp:dailyXP,
+    note:notesBox.value
+  };
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+  update();
+
+  showHistory();
+
 }
 
-input[type="checkbox"] {
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border: 2px solid #00eaff;
-  margin-right: 10px;
+function resetDay(){
+
+  data = initialData();
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+  location.reload();
+
 }
 
-input:checked {
-  background: #00eaff;
-  box-shadow: 0 0 10px #00eaff;
+function completeReset(){
+
+  localStorage.clear();
+
+  location.reload();
+
 }
 
-textarea {
-  width: 100%;
-  height: 80px;
-  background: #111;
-  color: white;
-  border-radius: 10px;
+function showHistory(){
+
+  const historyDiv =
+    document.getElementById("history");
+
+  historyDiv.innerHTML = "";
+
+  const days =
+    Object.keys(data.history);
+
+  days.reverse();
+
+  days.forEach(day=>{
+
+    const d = data.history[day];
+
+    historyDiv.innerHTML += `
+      <div class="history-day">
+
+        <b>${day}</b>
+
+        <h3 style="
+          margin-top:10px;
+          color:var(--primary);
+        ">
+          +${d.xp} XP
+        </h3>
+
+        ${
+          d.note
+          ?
+          `
+          <div class="history-note">
+            📝 ${d.note}
+          </div>
+          `
+          :
+          ""
+        }
+
+      </div>
+    `;
+
+  });
+
 }
 
-button {
-  padding: 14px 28px;
-  margin: 10px;
-  border-radius: 12px;
-  font-family: 'Rajdhani';
-  font-size: 18px;
-  border: none;
-  cursor: pointer;
+/* THEME */
+
+const themeBtn =
+  document.getElementById("themeBtn");
+
+themeBtn.addEventListener("click",()=>{
+
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "habitTheme",
+    document.body.classList.contains("light")
+      ? "light"
+      : "dark"
+  );
+
+});
+
+const savedTheme =
+  localStorage.getItem("habitTheme");
+
+if(savedTheme === "light"){
+  document.body.classList.add("light");
 }
 
-.end { background:#00eaff; box-shadow:0 0 15px #00eaff; }
-.reset { background:#ff0055; color:white; }
+showDate();
 
-.xp-bar {
-  width: 140px;
-  height: 10px;
-  background: #222;
-  border-radius: 10px;
-}
+render();
 
-#xp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #00eaff, #00ffaa);
-  animation: pulse 2s infinite;
-}
+update();
 
-@keyframes pulse {
-  0% { box-shadow:0 0 5px #00eaff; }
-  50% { box-shadow:0 0 20px #00eaff; }
-  100% { box-shadow:0 0 5px #00eaff; }
-}
-
-.history-day {
-  background: rgba(0,0,0,0.3);
-  padding: 10px;
-  margin-bottom: 10px;
-  border-left: 3px solid #00eaff;
-}
-
-/* 🔥 NEW CALC STYLE */
-#calc {
-  font-size: 14px;
-  line-height: 1.6;
-  border:1px solid #555;
-}
-
-/* Danger */
-.danger-zone { text-align:center; margin-top:40px; }
-
-.danger {
-  background: linear-gradient(135deg,#ff0033,#990000);
-  color:white;
-  box-shadow:0 0 15px red;
-}
-
-.popup {
-  display:none;
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.7);
-  top:0;
-  left:0;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-.popup-box {
-  background:#111;
-  padding:20px;
-  border-radius:15px;
-  border:1px solid red;
-}
-
-.confirm { background:red; color:white; }
-.cancel { background:gray; color:white; }
+showHistory();
