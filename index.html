@@ -1,84 +1,199 @@
-<!DOCTYPE html> 
-<html>
-<head>
-  <title>Life Game</title>
+<!DOCTYPE html>
+<html lang="en">
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Habit Game</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;500;600&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Habit Leveling</h1>
-<h2 id="date"></h2>
+  <!-- TOP -->
 
-<div class="top-bar">
-  <div>✨ XP: <span id="xp">0</span></div>
-  <div>🔥 Streak: <span id="streak">0</span></div>
+  <div class="top-fixed">
 
-  <div>
-    🏆 Level: <span id="level">1</span>
+    <div class="floating-stats">
+
+      <div class="floating-item xp-ui">
+        ✨ XP
+        <span id="xp">0</span>
+      </div>
+
+      <div class="floating-item streak-ui">
+        🔥 Streak
+        <span id="streak">0</span>
+      </div>
+
+    </div>
+
+    <button
+      id="themeBtn"
+      class="theme-toggle"
+    >
+      🌙 Theme
+    </button>
+
+  </div>
+
+  <!-- TITLE -->
+
+  <h1>HABIT GAME</h1>
+
+  <h2 id="date"></h2>
+
+  <!-- LEVEL -->
+
+  <div class="level-section">
+
+    <div class="level-text">
+      🏆 Level
+      <span id="level">1</span>
+    </div>
+
     <div class="xp-bar">
       <div id="xp-fill"></div>
     </div>
+
     <small id="xp-text"></small>
-  </div>
-</div>
 
-<div class="container">
-
-  <div class="card core">
-    <h3>🔒 Core Habits</h3>
-    <div id="core"></div>
   </div>
 
-  <div class="card normal">
-    <h3>⚡ Normal Habits</h3>
-    <div id="normal"></div>
+  <!-- HABITS -->
+
+  <div class="container">
+
+    <div class="card core">
+      <h3>🔒 CORE HABITS</h3>
+      <div id="core"></div>
+    </div>
+
+    <div class="card normal">
+      <h3>⚡ NORMAL HABITS</h3>
+      <div id="normal"></div>
+    </div>
+
+    <div class="card bonus">
+      <h3>🎁 BONUS</h3>
+      <div id="bonus"></div>
+    </div>
+
   </div>
 
-  <div class="card bonus">
-    <h3>🎁 Bonus</h3>
-    <div id="bonus"></div>
+  <!-- NOTES -->
+
+  <div class="bottom-grid">
+
+    <div class="card notes">
+
+      <h3>📝 NOTES</h3>
+
+      <textarea
+        id="notes"
+        placeholder="Write your thoughts..."
+      ></textarea>
+
+      <div class="auto-save">
+        ⭕ Auto-saved
+      </div>
+
+    </div>
+
+    <!-- MIND -->
+
+    <div class="card mind-card">
+
+      <h3>🧠 MIND CHECK</h3>
+
+      <div class="mind-options">
+
+        <label
+          class="mind-option good"
+          id="focusedCard"
+        >
+
+          <input
+            type="radio"
+            name="lazy"
+            id="lazyNo"
+          >
+
+          <div class="mind-content">
+            😊
+            <span>Focused</span>
+          </div>
+
+        </label>
+
+        <label
+          class="mind-option bad"
+          id="lazyCard"
+        >
+
+          <input
+            type="radio"
+            name="lazy"
+            id="lazyYes"
+          >
+
+          <div class="mind-content">
+            😴
+            <span>Lazy</span>
+          </div>
+
+        </label>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="card notes">
-    <h3>📝 Notes</h3>
-    <textarea id="notes"></textarea>
+  <!-- BUTTONS -->
+
+  <div class="buttons">
+
+    <button
+      class="end"
+      onclick="endDay()"
+    >
+      🚀 COMPLETE DAY
+    </button>
+
+    <button
+      class="reset"
+      onclick="resetDay()"
+    >
+      🔄 RESET TODAY
+    </button>
+
   </div>
 
-  <div class="card">
-    <h3>🧠 Was I Lazy Today?</h3>
-    <label><input type="radio" name="lazy" id="lazyNo"> ❌ No (Focused)</label>
-    <label><input type="radio" name="lazy" id="lazyYes"> 😴 Yes (Lazy)</label>
+  <div class="danger-zone">
+
+    <button
+      onclick="completeReset()"
+      class="danger-btn"
+    >
+      💀 COMPLETE RESET
+    </button>
+
   </div>
 
-</div>
+  <!-- HISTORY -->
 
-<div class="buttons">
-  <button class="end" onclick="endDay()">🚀 Complete Day</button>
-  <button class="reset" onclick="resetDay()">♻️ Reset Today</button>
-</div>
+  <h3 class="history-title">
+    📅 HISTORY
+  </h3>
 
-<div style="text-align:center;margin-top:30px;">
-  <button onclick="completeReset()" style="
-    background: linear-gradient(135deg,#ff0033,#990000);
-    color:white;
-    padding:14px 28px;
-    border:none;
-    border-radius:12px;
-    font-size:18px;
-    box-shadow:0 0 15px red;
-    cursor:pointer;
-  ">
-    💀 Complete Reset
-  </button>
-</div>
+  <div id="history"></div>
 
-<h3 class="history-title">📅 History</h3>
-<div id="history"></div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
