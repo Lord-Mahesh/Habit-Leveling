@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Habit Game</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;500;600&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- TOP -->
+
+  <div class="top-fixed">
+
+    <div class="floating-stats">
+
+      <div class="floating-item xp-ui">
+        ✨ XP
+        <span id="xp">0</span>
+      </div>
+
+      <div class="floating-item streak-ui">
+        🔥 Streak
+        <span id="streak">0</span>
+      </div>
+
+    </div>
+
+    <button
+      id="themeBtn"
+      class="theme-toggle"
+    >
+      🌙 Theme
+    </button>
+
+  </div>
+
+  <!-- TITLE -->
+
+  <h1>HABIT GAME</h1>
+
+  <h2 id="date"></h2>
+
+  <!-- LEVEL -->
+
+  <div class="level-section">
+
+    <div class="level-text">
+      🏆 Level
+      <span id="level">1</span>
+    </div>
+
+    <div class="xp-bar">
+      <div id="xp-fill"></div>
+    </div>
+
+    <small id="xp-text"></small>
+
+  </div>
+
+  <!-- HABITS -->
+
+  <div class="container">
+
+    <div class="card core">
+      <h3>🔒 CORE HABITS</h3>
+      <div id="core"></div>
+    </div>
+
+    <div class="card normal">
+      <h3>⚡ NORMAL HABITS</h3>
+      <div id="normal"></div>
+    </div>
+
+    <div class="card bonus">
+      <h3>🎁 BONUS</h3>
+      <div id="bonus"></div>
+    </div>
+
+  </div>
+
+  <!-- NOTES -->
+
+  <div class="bottom-grid">
+
+    <div class="card notes">
+
+      <h3>📝 NOTES</h3>
+
+      <textarea
+        id="notes"
+        placeholder="Write your thoughts..."
+      ></textarea>
+
+      <div class="auto-save">
+        ⭕ Auto-saved
+      </div>
+
+    </div>
+
+    <!-- MIND -->
+
+    <div class="card mind-card">
+
+      <h3>🧠 MIND CHECK</h3>
+
+      <div class="mind-options">
+
+        <label
+          class="mind-option good"
+          id="focusedCard"
+        >
+
+          <input
+            type="radio"
+            name="lazy"
+            id="lazyNo"
+          >
+
+          <div class="mind-content">
+            😊
+            <span>Focused</span>
+          </div>
+
+        </label>
+
+        <label
+          class="mind-option bad"
+          id="lazyCard"
+        >
+
+          <input
+            type="radio"
+            name="lazy"
+            id="lazyYes"
+          >
+
+          <div class="mind-content">
+            😴
+            <span>Lazy</span>
+          </div>
+
+        </label>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BUTTONS -->
+
+  <div class="buttons">
+
+    <button
+      class="end"
+      onclick="endDay()"
+    >
+      🚀 COMPLETE DAY
+    </button>
+
+    <button
+      class="reset"
+      onclick="resetDay()"
+    >
+      🔄 RESET TODAY
+    </button>
+
+  </div>
+
+  <div class="danger-zone">
+
+    <button
+      onclick="completeReset()"
+      class="danger-btn"
+    >
+      💀 COMPLETE RESET
+    </button>
+
+  </div>
+
+  <!-- HISTORY -->
+
+  <h3 class="history-title">
+    📅 HISTORY
+  </h3>
+
+  <div id="history"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

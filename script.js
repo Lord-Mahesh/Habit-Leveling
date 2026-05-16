@@ -1,0 +1,345 @@
+const core = [
+  {name:"🏫 College",xp:15},
+  {name:"💪 Gym",xp:15},
+  {name:"📖 Reading",xp:10},
+  {name:"🎸 Ukulele",xp:5},
+  {name:"🧩 Cube",xp:5},
+  {name:"🧘 Meditation",xp:5}
+];
+
+const normal = [
+  {name:"🤸 Stretching",xp:5},
+  {name:"🥚 Eggs",xp:5},
+  {name:"💰 Spending",xp:5},
+  {name:"🪥 Brush",xp:5}
+];
+
+const bonus = [
+  {name:"🌅 Wake before 6:30",xp:5},
+  {name:"🌙 Sleep before 11",xp:5},
+  {name:"🏋️ Weights",xp:5},
+  {name:"⚡ Cube PB",xp:10},
+  {name:"🔥 Hard Practice",xp:10}
+];
+
+function initialData(){
+  return {
+    xp:0,
+    streak:0,
+    level:1,
+    levelXP:0,
+    history:{},
+    notes:""
+  };
+}
+
+let data =
+  JSON.parse(localStorage.getItem("lifeGame"))
+  || initialData();
+
+function today(){
+  return new Date().toDateString();
+}
+
+function showDate(){
+  document.getElementById("date").innerText =
+    today();
+}
+
+function render(){
+
+  const coreDiv =
+    document.getElementById("core");
+
+  const normalDiv =
+    document.getElementById("normal");
+
+  const bonusDiv =
+    document.getElementById("bonus");
+
+  coreDiv.innerHTML = "";
+  normalDiv.innerHTML = "";
+  bonusDiv.innerHTML = "";
+
+  core.forEach((h,i)=>{
+
+    coreDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="c${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
+  normal.forEach((h,i)=>{
+
+    normalDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="n${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
+  bonus.forEach((h,i)=>{
+
+    bonusDiv.innerHTML += `
+      <label>
+        <div>
+          <input id="b${i}" type="checkbox">
+          ${h.name}
+        </div>
+
+        <span>+${h.xp} XP</span>
+      </label>
+    `;
+
+  });
+
+}
+
+function need(level){
+  return 100 + (level - 1);
+}
+
+function update(){
+
+  document.getElementById("xp").innerText =
+    data.xp;
+
+  document.getElementById("streak").innerText =
+    data.streak;
+
+  document.getElementById("level").innerText =
+    data.level;
+
+  let percent =
+    (data.levelXP / need(data.level)) * 100;
+
+  percent = Math.min(percent,100);
+
+  document.getElementById("xp-fill").style.width =
+    percent + "%";
+
+  document.getElementById("xp-text").innerText =
+    `${data.levelXP}/${need(data.level)} XP`;
+
+}
+
+/* NOTES */
+
+const notesBox =
+  document.getElementById("notes");
+
+notesBox.value = data.notes || "";
+
+notesBox.addEventListener("input",()=>{
+
+  data.notes = notesBox.value;
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+});
+
+/* MIND */
+
+const focusedCard =
+  document.getElementById("focusedCard");
+
+const lazyCard =
+  document.getElementById("lazyCard");
+
+focusedCard.addEventListener("click",()=>{
+
+  document.getElementById("lazyNo").checked = true;
+
+  focusedCard.classList.add("selected");
+
+  lazyCard.classList.remove("selected");
+
+});
+
+lazyCard.addEventListener("click",()=>{
+
+  document.getElementById("lazyYes").checked = true;
+
+  lazyCard.classList.add("selected");
+
+  focusedCard.classList.remove("selected");
+
+});
+
+/* END DAY */
+
+function endDay(){
+
+  const k = today();
+
+  if(data.history[k]){
+    alert("Already submitted today");
+    return;
+  }
+
+  let dailyXP = 0;
+
+  core.forEach((h,i)=>{
+    if(document.getElementById("c"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  normal.forEach((h,i)=>{
+    if(document.getElementById("n"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  bonus.forEach((h,i)=>{
+    if(document.getElementById("b"+i).checked){
+      dailyXP += h.xp;
+    }
+  });
+
+  data.streak++;
+
+  data.levelXP += dailyXP;
+
+  while(data.levelXP >= need(data.level)){
+
+    data.levelXP -= need(data.level);
+
+    data.level++;
+
+  }
+
+  data.xp += dailyXP;
+
+  data.history[k] = {
+    xp:dailyXP,
+    note:notesBox.value
+  };
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+  update();
+
+  showHistory();
+
+}
+
+function resetDay(){
+
+  data = initialData();
+
+  localStorage.setItem(
+    "lifeGame",
+    JSON.stringify(data)
+  );
+
+  location.reload();
+
+}
+
+function completeReset(){
+
+  localStorage.clear();
+
+  location.reload();
+
+}
+
+function showHistory(){
+
+  const historyDiv =
+    document.getElementById("history");
+
+  historyDiv.innerHTML = "";
+
+  const days =
+    Object.keys(data.history);
+
+  days.reverse();
+
+  days.forEach(day=>{
+
+    const d = data.history[day];
+
+    historyDiv.innerHTML += `
+      <div class="history-day">
+
+        <b>${day}</b>
+
+        <h3 style="
+          margin-top:10px;
+          color:var(--primary);
+        ">
+          +${d.xp} XP
+        </h3>
+
+        ${
+          d.note
+          ?
+          `
+          <div class="history-note">
+            📝 ${d.note}
+          </div>
+          `
+          :
+          ""
+        }
+
+      </div>
+    `;
+
+  });
+
+}
+
+/* THEME */
+
+const themeBtn =
+  document.getElementById("themeBtn");
+
+themeBtn.addEventListener("click",()=>{
+
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "habitTheme",
+    document.body.classList.contains("light")
+      ? "light"
+      : "dark"
+  );
+
+});
+
+const savedTheme =
+  localStorage.getItem("habitTheme");
+
+if(savedTheme === "light"){
+  document.body.classList.add("light");
+}
+
+showDate();
+
+render();
+
+update();
+
+showHistory();
